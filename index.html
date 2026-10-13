@@ -1,0 +1,1173 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ebenezer Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barra lateral de navegación + lienzo operativo en escritorio; en móvil, header compacto + barra inferior de pestañas. Un solo look oscuro, deliberado. */
+:root{
+  --bg:#0A0C11; --surface:#11141B; --surface-2:#161A23; --raise:#1D2230;
+  --line:#212736; --line-2:#2D3446;
+  --fg:#E9EBF1; --muted:#8E95A8; --faint:#5E6578;
+  --accent:#A3B4FF; --accent-dim:rgba(163,180,255,.11); --accent-ink:#0B0E18;
+  --ok:#56CF95; --ok-dim:rgba(86,207,149,.12);
+  --warn:#E8B755; --warn-dim:rgba(232,183,85,.12);
+  --bad:#F27B7B; --bad-dim:rgba(242,123,123,.12);
+  --sans:"Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+ul{list-style:none;margin:0;padding:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Shell */
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:22px;padding:20px 14px;background:var(--surface);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px}
+.brand-mark{width:28px;height:28px;flex:none}
+.brand b{display:block;font-size:14px;letter-spacing:.14em;font-weight:600}
+.brand small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em}
+.nav{display:grid;gap:2px}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:var(--muted);text-align:left;font-weight:500}
+.nav button:hover{background:var(--surface-2);color:var(--fg)}
+.nav button[aria-current="page"]{background:var(--raise);color:var(--fg)}
+.nav svg{width:18px;height:18px;flex:none}
+.side-foot{margin-top:auto;display:grid;gap:12px}
+.whocard{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.whocard b{display:block;font-size:13px}
+.whocard small{display:block;font-size:11.5px;color:var(--muted)}
+.sig{display:flex;justify-content:space-between;align-items:center;padding:0 8px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.04em}
+.linkbtn{border:0;background:none;padding:0;color:var(--muted);font-size:11px;font-family:var(--mono);text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--fg)}
+
+.mainwrap{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 32px;background:rgba(10,12,17,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top-l{display:flex;align-items:center;gap:12px;min-width:0}
+.top-l .brand-mark{display:none}
+.top h1{font-size:18px}
+.top p{font-size:12.5px;color:var(--muted)}
+.seg{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:6px 12px;border-radius:6px;color:var(--muted);font-size:12.5px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line-2) inset}
+.rolewrap{display:flex;align-items:center;gap:10px}
+.rolewrap > span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--faint)}
+main{padding:28px 32px 48px;display:grid;gap:20px;align-content:start;max-width:1280px;width:100%}
+.tabbar{display:none}
+
+/* Building blocks */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;min-width:0}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.panel-h h2{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.panel-h .count{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.rows > li{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}
+.rows > li:first-child{border-top:0}
+.rows .grow{flex:1;min-width:0}
+.rows .t{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rows .s{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{padding:22px 16px;color:var(--muted);font-size:13px;text-align:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 13px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--fg);font-size:13px;font-weight:500;white-space:nowrap;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--raise)}
+.btn svg{width:16px;height:16px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.pri:hover{background:#B6C4FF}
+.btn.okb{background:var(--ok);border-color:var(--ok);color:#06140D}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--fg)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn.lg{padding:12px 16px;font-size:14.5px;border-radius:10px}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.icobtn{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted)}
+.icobtn:hover{background:var(--raise);color:var(--fg)}
+.icobtn svg{width:16px;height:16px}
+.icobtn[disabled]{opacity:.3;cursor:default;background:transparent}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 8px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;border:1px solid transparent}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);background:var(--ok-dim)}
+.pill.warn{color:var(--warn);background:var(--warn-dim)}
+.pill.bad{color:var(--bad);background:var(--bad-dim)}
+.pill.open{color:var(--muted);border:1px dashed var(--line-2)}
+.pill.open::before{background:transparent;border:1px solid currentColor}
+.pill.acc{color:var(--accent);background:var(--accent-dim)}
+.tag{display:inline-flex;align-items:center;padding:1px 7px;border-radius:5px;background:var(--raise);color:var(--muted);font-size:11.5px;white-space:nowrap}
+.av{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line-2);font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.av.lg{width:40px;height:40px;font-size:13px}
+
+/* Dashboard */
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.quick button{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);text-align:left;font-weight:500}
+.quick button:hover{border-color:var(--line-2);background:var(--surface-2)}
+.quick svg{width:18px;height:18px;color:var(--accent);flex:none}
+.hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;padding:24px;border-radius:14px;border:1px solid var(--line);background:radial-gradient(700px 240px at 0% 0%,rgba(163,180,255,.09),transparent 70%),var(--surface)}
+.hero h2{font-size:28px;margin-top:6px;letter-spacing:-.02em}
+.hero .meta{margin-top:6px;color:var(--muted);font-size:12.5px;letter-spacing:.04em}
+.cov{display:flex;gap:2px;height:8px;border-radius:99px;overflow:hidden;background:var(--raise);margin-top:22px}
+.cov i{display:block;height:100%}
+.cov .c{background:var(--ok)}.cov .p{background:var(--warn)}.cov .o{background:transparent}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:22px}
+.step{padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);min-width:0}
+.step .k{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.step .k b{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-2);color:var(--muted);font-weight:500}
+.step.done .k b{background:var(--ok);border-color:var(--ok);color:#06140D}
+.step .v{margin-top:4px;font-weight:500;font-size:13px}
+.kpis{display:grid;gap:10px;align-content:start}
+.kpi{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.kpi .n{font-family:var(--mono);font-size:30px;font-weight:500;line-height:1;letter-spacing:-.02em}
+.kpi .l{font-size:12.5px;color:var(--muted);text-align:right}
+.kpi.ok .n{color:var(--ok)}.kpi.warn .n{color:var(--warn)}.kpi.bad .n{color:var(--bad)}
+.datebox{width:44px;flex:none;text-align:center;padding:5px 0;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.datebox small{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em}
+.datebox b{display:block;font-family:var(--mono);font-size:17px;font-weight:500;line-height:1.1}
+.logi{font-size:13px}
+.logi b{font-weight:500}
+.logi time{display:block;font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+/* Servidor */
+.greet h2{font-size:26px;letter-spacing:-.02em}
+.greet p{color:var(--muted);margin-top:4px}
+.mycards{display:grid;gap:12px}
+.mycard{padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:grid;gap:14px}
+.mycard.pending{border-color:rgba(232,183,85,.35);background:linear-gradient(180deg,rgba(232,183,85,.05),transparent 60%),var(--surface)}
+.mycard .hd{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mycard h3{font-size:18px}
+.mycard .when{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:3px;letter-spacing:.03em}
+.mycard .role{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.mycard .role b{font-weight:600}
+.mycard .acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.contact{display:flex;align-items:center;gap:12px;padding:16px}
+.contact .num{font-family:var(--mono);user-select:all}
+
+/* Calendar */
+.calbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calbar h2{font-size:18px;min-width:0}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--line);gap:1px}
+.wday{background:var(--surface);min-height:220px;display:flex;flex-direction:column;min-width:0}
+.wday .wh{display:flex;align-items:baseline;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.wday .wh span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted)}
+.wday .wh b{font-family:var(--mono);font-size:16px;font-weight:500}
+.wday.today .wh b{color:var(--accent)}
+.wday.today{background:linear-gradient(180deg,rgba(163,180,255,.06),transparent 40%),var(--surface)}
+.wday .wb{padding:8px;display:grid;gap:6px;align-content:start}
+.none{color:var(--faint);font-size:12px;padding:4px}
+.evc{display:grid;gap:3px;width:100%;text-align:left;padding:9px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2)}
+.evc:hover{border-color:var(--accent)}
+.evc .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.evc .tt{font-weight:500;font-size:13px;line-height:1.3}
+.evc .ft{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:3px}
+.evc.culto .tm{color:var(--accent)}
+.evc.mine{border-color:rgba(232,183,85,.45)}
+.month{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mhead,.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.mhead div{padding:8px 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line)}
+.mgrid{gap:1px;background:var(--line)}
+.mcell{background:var(--surface);min-height:104px;padding:6px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.mcell.out{background:var(--bg)}
+.mcell.out .dn{color:var(--faint)}
+.mcell .dn{font-family:var(--mono);font-size:12px;color:var(--muted);padding:2px 4px}
+.mcell.today .dn{color:var(--accent-ink);background:var(--accent);border-radius:5px;align-self:flex-start;font-weight:500}
+.mev{display:flex;gap:6px;align-items:center;width:100%;text-align:left;border:0;padding:3px 5px;border-radius:5px;background:var(--surface-2);font-size:11.5px;overflow:hidden;white-space:nowrap;min-width:0}
+.mev:hover{background:var(--raise)}
+.mev i{width:6px;height:6px;border-radius:50%;flex:none;background:var(--muted)}
+.mev.culto i{background:var(--accent)}
+.mev span{overflow:hidden;text-overflow:ellipsis}
+.mlist{display:none}
+
+/* Plan */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;display:grid;gap:1px;text-align:left;padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface)}
+.chip small{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em}
+.chip b{font-weight:500;font-size:13px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.planhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px;align-items:flex-start}
+.planhead h2{font-size:20px}
+.strip{display:flex;gap:2px;height:30px;border-radius:7px;overflow:hidden;margin:0 18px}
+.strip div{min-width:0;display:flex;align-items:center;padding:0 7px;font-size:11px;color:var(--fg);background:var(--raise);overflow:hidden;white-space:nowrap}
+.strip div:nth-child(odd){background:#262D40}
+.strip div.hi{background:rgba(163,180,255,.28)}
+.strip .rest{background:transparent!important;border:1px dashed var(--line-2);color:var(--faint)}
+.durline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 18px 16px;font-size:12.5px;color:var(--muted)}
+.durline .over{color:var(--warn)}
+.items > li{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:14px;padding:14px 18px;border-top:1px solid var(--line);align-items:start}
+.items .at{font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:1px}
+.items .at small{display:block;color:var(--faint);font-size:11px}
+.items .ti{font-weight:600}
+.items .rp{font-size:12.5px;color:var(--muted);margin-top:1px}
+.items .nt{margin-top:7px;font-size:12.5px;color:var(--fg);padding:7px 10px;border-radius:7px;background:var(--bg);border:1px solid var(--line)}
+.items .ctl{display:flex;gap:2px}
+.items li.mine{background:linear-gradient(90deg,rgba(232,183,85,.06),transparent)}
+
+/* Servidores */
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tgroup .panel-h h2{color:var(--fg);font-family:var(--sans);text-transform:none;letter-spacing:0;font-size:14px;font-weight:600}
+.prow{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,1.4fr) auto auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
+.prow:first-child{border-top:0}
+.prow .rl{font-weight:500;font-size:13px}
+.prow .ps{display:flex;align-items:center;gap:9px;min-width:0}
+.prow .ps span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .ps small{display:block;color:var(--muted);font-size:11.5px}
+.prow .acts{display:flex;gap:6px;justify-content:flex-end}
+.prow.open .rl{color:var(--muted)}
+.strike{text-decoration:line-through;color:var(--muted)}
+
+/* Personas */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{position:relative;flex:1;min-width:200px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--faint)}
+.search input{padding-left:34px}
+.tblwrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:500;padding:11px 16px;border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 16px;border-top:1px solid var(--line);vertical-align:middle}
+.tbl tr:first-child td{border-top:0}
+.tbl .who{display:flex;align-items:center;gap:10px;min-width:0}
+.tbl .who b{font-weight:500;display:block}
+.tbl .who small{color:var(--muted);font-size:12px}
+.tbl tr.inactive .who b{color:var(--muted)}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+
+/* Equipos */
+.teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.teamc{display:grid;gap:12px;text-align:left;padding:18px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.teamc:hover{border-color:var(--line-2);background:var(--surface-2)}
+.teamc h3{font-size:16px}
+.teamc .ld{font-size:12.5px;color:var(--muted)}
+.teamc .ft{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.mini{display:flex;gap:2px;height:5px;width:90px;border-radius:9px;overflow:hidden;background:var(--raise)}
+.mini i{display:block;height:100%}
+
+/* Forms */
+.field{display:grid;gap:6px;min-width:0}
+.field label,.field .lb{font-size:12px;color:var(--muted);font-weight:500}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=time],input[type=number],input[type=search],select,textarea{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg);color:var(--fg);outline:0}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg);font-size:13px;color:var(--fg);cursor:pointer}
+.checks input{accent-color:var(--accent)}
+.err{color:var(--bad);font-size:12.5px}
+.hint{color:var(--faint);font-size:12px}
+
+/* Modal + toast */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(4,5,8,.66);backdrop-filter:blur(4px)}
+.dlg{width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.m-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 20px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
+.m-h h3{font-size:17px;margin-top:3px}
+.m-b{padding:18px 20px;display:grid;gap:14px}
+.m-f{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.cand{display:grid;gap:6px}
+.cand button{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);text-align:left}
+.cand button:not([disabled]):hover{border-color:var(--accent)}
+.cand button[disabled]{opacity:.55;cursor:not-allowed}
+.cand .nm{flex:1;min-width:0}
+.cand .nm b{display:block;font-weight:500}
+.cand .nm small{display:block;color:var(--muted);font-size:12px}
+.kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 14px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:10px;background:var(--raise);border:1px solid var(--line-2);box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:13px}
+.toast i{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.toast.bad i{background:var(--bad)}
+.toast small{color:var(--muted)}
+.note{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:9px;border:1px dashed var(--line-2);color:var(--muted);font-size:12.5px}
+
+/* Responsive */
+@media (max-width:1100px){
+  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi{flex-direction:column;align-items:flex-start}
+  .kpi .l{text-align:left}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .top{padding:12px 16px}
+  .top-l .brand-mark{display:block}
+  .top h1{font-size:16px}
+  .top p{display:none}
+  .rolewrap > span{display:none}
+  main{padding:18px 16px 110px;gap:16px}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:rgba(17,20,27,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+  .tabbar button{flex:1;min-width:0;display:grid;justify-items:center;gap:3px;padding:6px 2px;border:0;background:transparent;color:var(--faint);font-size:10.5px;font-weight:500;border-radius:8px}
+  .tabbar button[aria-current="page"]{color:var(--fg)}
+  .tabbar button[aria-current="page"] svg{color:var(--accent)}
+  .tabbar svg{width:21px;height:21px}
+  .toast{bottom:88px}
+  .hero{padding:18px;gap:18px}
+  .hero h2{font-size:23px}
+  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .week{grid-template-columns:minmax(0,1fr)}
+  .wday{min-height:0;flex-direction:row}
+  .wday .wh{flex-direction:column;align-items:center;gap:0;width:58px;flex:none;border-bottom:0;border-right:1px solid var(--line);padding:10px 0}
+  .wday .wb{flex:1;min-width:0}
+  .mcell{min-height:56px}
+  .mev{padding:0;background:transparent;width:auto}
+  .mev span{display:none}
+  .mev i{width:7px;height:7px}
+  .mcell .evs{display:flex;gap:3px;flex-wrap:wrap;padding:0 4px}
+  .mlist{display:block}
+  .prow{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}
+  .prow .ps{grid-column:1/-1;order:3}
+  .prow .acts{grid-column:1/-1;order:4;justify-content:flex-start}
+  .tbl thead{display:none}
+  .tbl tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:12px 16px;border-top:1px solid var(--line)}
+  .tbl tr:first-child{border-top:0}
+  .tbl td{padding:0;border:0}
+  .tbl td.c-teams,.tbl td.c-last,.tbl td.c-phone{grid-column:1/-1}
+  .tbl td.c-last:empty,.tbl td.c-phone:empty{display:none}
+  .f2,.f3{grid-template-columns:minmax(0,1fr)}
+  .modal{place-items:end center;padding:0}
+  .dlg{width:100%;max-height:90vh;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .items > li{grid-template-columns:48px minmax(0,1fr);gap:12px}
+  .items .ctl{grid-column:2}
+  .strip{margin:0 16px}
+}
+@media (max-width:520px){
+  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .kpi{padding:11px 12px}
+  .kpi .n{font-size:24px}
+  .kpi .l{font-size:11.5px}
+  .seg button{padding:6px 9px}
+}
+</style>
+
+<div class="app">
+  <aside class="side" aria-label="Navegación">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="7" fill="#161A23" stroke="#2D3446"/><rect x="6" y="18" width="16" height="4" rx="2" fill="#A3B4FF"/><rect x="8" y="12.5" width="12" height="4" rx="2" fill="#A3B4FF" opacity=".7"/><rect x="10.5" y="7" width="7" height="4" rx="2" fill="#A3B4FF" opacity=".45"/></svg>
+      <div><b>EBENEZER</b><small>HUB · MVP v0.1</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="whocard" id="who"></div>
+      <div class="sig"><span>@majeokey</span><button class="linkbtn" data-a="reset">Restablecer demo</button></div>
+    </div>
+  </aside>
+  <div class="mainwrap">
+    <header class="top">
+      <div class="top-l">
+        <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true" style="width:26px;height:26px;flex:none"><rect x="1" y="1" width="26" height="26" rx="7" fill="#161A23" stroke="#2D3446"/><rect x="6" y="18" width="16" height="4" rx="2" fill="#A3B4FF"/><rect x="8" y="12.5" width="12" height="4" rx="2" fill="#A3B4FF" opacity=".7"/><rect x="10.5" y="7" width="7" height="4" rx="2" fill="#A3B4FF" opacity=".45"/></svg>
+        <div style="min-width:0"><h1 id="pageTitle">Inicio</h1><p id="pageSub"></p></div>
+      </div>
+      <div class="rolewrap"><span>VER COMO</span><div class="seg" id="roleSeg" role="group" aria-label="Rol de la demo">
+        <button data-a="role" data-r="admin">Admin</button><button data-a="role" data-r="lider">Líder</button><button data-a="role" data-r="servidor">Servidor</button>
+      </div></div>
+    </header>
+    <main id="main"></main>
+  </div>
+  <nav class="tabbar" id="tabbar" aria-label="Navegación móvil"></nav>
+</div>
+<div class="modal" id="modal" hidden></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+/* ============ Datos ficticios ============ */
+const TODAY = '2026-10-13';
+const KEY = 'ebenezer-hub-demo-v1';
+const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DOW = ['dom','lun','mar','mié','jue','vie','sáb'];
+const DOWL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function buildSeed(){
+  let n = 1;
+  const P = (team, role, person = null, status = null, note = '') => ({ id: 'q' + (n++), team, role, person, status: person ? (status || 'pendiente') : null, note });
+  const slug = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const H = (id, first, last, teams, phone, o = {}) => ({ id, first, last, teams, phone, email: o.noEmail ? '' : slug(first) + '.' + slug(last) + '@ejemplo.org', active: o.active !== false, blocked: o.blocked || [] });
+  const people = [
+    H('p0','Mariela','Sosa',[],'+54 9 11 5555-0100'),
+    H('p1','Lucía','Ferreyra',['alabanza'],'+54 9 11 5555-0101'),
+    H('p2','Sofía','Medina',['alabanza'],'+54 9 11 5555-0102'),
+    H('p3','Martín','Quiroga',['alabanza'],'+54 9 11 5555-0103',{blocked:['2026-10-25']}),
+    H('p4','Diego','Paz',['alabanza'],'',{blocked:['2026-10-18']}),
+    H('p5','Nicolás','Herrera',['alabanza'],'+54 9 11 5555-0105'),
+    H('p6','Camila','Ortiz',['alabanza'],'+54 9 11 5555-0106'),
+    H('p7','Joaquín','Villalba',['alabanza','multimedia'],'+54 9 11 5555-0107'),
+    H('p8','Tomás','Benítez',['sonido'],'+54 9 11 5555-0108'),
+    H('p9','Hernán','Acosta',['sonido'],'+54 9 11 5555-0109'),
+    H('p10','Valentina','Romero',['multimedia'],'+54 9 11 5555-0110'),
+    H('p11','Bruno','Castillo',['multimedia'],'',{noEmail:true}),
+    H('p12','Graciela','Núñez',['recepcion'],'+54 9 11 5555-0112'),
+    H('p13','Raúl','Domínguez',['recepcion'],'+54 9 11 5555-0113'),
+    H('p14','Carolina','Vega',['ninos'],'+54 9 11 5555-0114'),
+    H('p15','Agustina','Molina',['ninos','recepcion'],'+54 9 11 5555-0115'),
+    H('p16','Ana','Gutiérrez',['intercesion'],'+54 9 11 5555-0116'),
+    H('p17','Ramiro','Sosa',['produccion','sonido'],'+54 9 11 5555-0117'),
+    H('p18','Elena','Ibarra',['intercesion'],'',{active:false}),
+    H('p19','Pablo','Rivero',['multimedia'],'+54 9 11 5555-0119'),
+  ];
+  const teams = [
+    {id:'alabanza',name:'Alabanza',leader:'p1',roles:['Dirección','Voz','Teclado','Guitarra','Bajo','Batería']},
+    {id:'sonido',name:'Sonido',leader:'p9',roles:['Operador de sonido','Asistente']},
+    {id:'multimedia',name:'Multimedia',leader:'p10',roles:['Proyección','Transmisión']},
+    {id:'recepcion',name:'Recepción',leader:'p12',roles:['Bienvenida','Ujier']},
+    {id:'intercesion',name:'Intercesión',leader:'p16',roles:['Intercesor']},
+    {id:'ninos',name:'Niños',leader:'p14',roles:['Maestra','Asistente']},
+    {id:'produccion',name:'Producción',leader:'p17',roles:['Coordinación']},
+  ];
+  const events = [
+    {id:'e7',title:'Culto dominical',type:'culto',date:'2026-10-04',time:'10:00',dur:100,place:'Templo principal',desc:'',positions:[P('alabanza','Dirección','p1','confirmado'),P('alabanza','Teclado','p3','confirmado'),P('alabanza','Guitarra','p6','confirmado'),P('sonido','Operador de sonido','p9','confirmado'),P('multimedia','Proyección','p10','confirmado')]},
+    {id:'e6',title:'Culto dominical',type:'culto',date:'2026-10-11',time:'10:00',dur:100,place:'Templo principal',desc:'',positions:[P('alabanza','Dirección','p1','confirmado'),P('alabanza','Voz','p2','confirmado'),P('alabanza','Teclado','p3','confirmado'),P('alabanza','Guitarra','p6','confirmado'),P('alabanza','Bajo','p4','confirmado'),P('alabanza','Batería','p5','confirmado'),P('sonido','Operador de sonido','p8','confirmado'),P('multimedia','Proyección','p11','confirmado'),P('multimedia','Transmisión','p7','confirmado'),P('recepcion','Bienvenida','p12','confirmado'),P('recepcion','Ujier','p13','confirmado'),P('ninos','Maestra','p14','confirmado'),P('ninos','Asistente','p15','confirmado')]},
+    {id:'e0',title:'Reunión de oración',type:'evento',date:'2026-10-14',time:'20:00',dur:90,place:'Salón anexo',desc:'Oración por la iglesia y la ciudad.',positions:[P('intercesion','Intercesor','p16','confirmado'),P('sonido','Operador de sonido','p8','confirmado')]},
+    {id:'e2',title:'Ensayo de alabanza',type:'evento',date:'2026-10-17',time:'17:00',dur:120,place:'Templo principal',desc:'Repaso del repertorio del domingo.',positions:[P('alabanza','Dirección','p1','confirmado'),P('alabanza','Voz','p2','confirmado'),P('alabanza','Teclado','p3','pendiente'),P('alabanza','Batería','p5','confirmado'),P('sonido','Operador de sonido','p9','confirmado')]},
+    {id:'e1',title:'Culto dominical',type:'culto',date:'2026-10-18',time:'10:00',dur:100,place:'Templo principal',desc:'Serie «Piedra de ayuda» · 1 Samuel 7:12',positions:[
+      P('alabanza','Dirección','p1','confirmado'),P('alabanza','Voz','p2','confirmado'),P('alabanza','Teclado','p3','pendiente'),P('alabanza','Guitarra'),P('alabanza','Bajo','p4','rechazado','Viaje familiar ese fin de semana'),P('alabanza','Batería','p5','confirmado'),
+      P('sonido','Operador de sonido','p8','pendiente'),P('sonido','Asistente','p17','confirmado'),
+      P('multimedia','Proyección','p10','confirmado'),P('multimedia','Transmisión'),
+      P('recepcion','Bienvenida','p12','confirmado'),P('recepcion','Ujier','p13','pendiente'),
+      P('ninos','Maestra','p14','confirmado'),P('ninos','Asistente'),
+      P('intercesion','Intercesor','p16','confirmado')]},
+    {id:'e5',title:'Reunión de líderes',type:'evento',date:'2026-10-20',time:'19:30',dur:90,place:'Oficina pastoral',desc:'Planificación de noviembre.',positions:[]},
+    {id:'e3',title:'Culto de jóvenes',type:'culto',date:'2026-10-23',time:'20:30',dur:120,place:'Templo principal',desc:'',positions:[P('alabanza','Dirección','p7','pendiente'),P('alabanza','Voz','p6','confirmado'),P('sonido','Operador de sonido','p17','pendiente'),P('multimedia','Proyección','p11','confirmado')]},
+    {id:'e4',title:'Culto dominical',type:'culto',date:'2026-10-25',time:'10:00',dur:100,place:'Templo principal',desc:'',positions:[P('alabanza','Dirección','p1','pendiente'),P('alabanza','Teclado'),P('sonido','Operador de sonido','p8','pendiente'),P('multimedia','Proyección'),P('recepcion','Bienvenida','p15','pendiente'),P('ninos','Maestra')]},
+  ];
+  const it = (title, dur, resp = '', notes = '') => ({ id: 'i' + (n++), title, dur, resp, notes });
+  const plans = {
+    e1: { items: [
+      it('Bienvenida',5,'Pastor Esteban Ríos','Saludo y presentación de la serie.'),
+      it('Alabanza',25,'Equipo de Alabanza','Set de 4 canciones. Cierre en Re.'),
+      it('Oración pastoral',5,'Ana Gutiérrez'),
+      it('Anuncios',5,'Mariela Sosa','Retiro de jóvenes: inscripción hasta el 31/10.'),
+      it('Ofrenda',5,'Recepción','Instrumental de fondo.'),
+      it('Predicación',40,'Pastor Esteban Ríos','1 Samuel 7:12. Slides a cargo de Multimedia.'),
+      it('Cierre y bendición',5,'Pastor Esteban Ríos')]},
+    e0: { items: [it('Bienvenida',5,'Ana Gutiérrez'),it('Lectura',10,'Ana Gutiérrez','Salmo 121'),it('Oración por la iglesia',30,'Intercesión'),it('Oración por la ciudad',30,'Intercesión'),it('Cierre',5,'Ana Gutiérrez')]},
+  };
+  const templates = [
+    {id:'t1',name:'Culto dominical',items:[it('Bienvenida',5),it('Alabanza',25,'Equipo de Alabanza'),it('Oración',5),it('Anuncios',5),it('Ofrenda',5),it('Predicación',40),it('Cierre y bendición',5)]},
+    {id:'t2',name:'Reunión de oración',items:[it('Bienvenida',5),it('Lectura',10),it('Oración en grupos',45),it('Cierre',5)]},
+    {id:'t3',name:'Culto de jóvenes',items:[it('Bienvenida',5),it('Alabanza',30,'Equipo de Alabanza'),it('Dinámica',15),it('Mensaje',35),it('Cierre',5)]},
+  ];
+  const log = [
+    {t:'13/10 18:40',who:'Lucía Ferreyra',txt:'asignó a Martín Quiroga en Teclado · Culto dominical 18/10'},
+    {t:'13/10 17:12',who:'Diego Paz',txt:'rechazó Bajo · Culto dominical 18/10'},
+    {t:'13/10 11:05',who:'Mariela Sosa',txt:'armó el plan del Culto dominical 18/10'},
+    {t:'12/10 21:30',who:'Valentina Romero',txt:'confirmó Proyección · Culto dominical 18/10'},
+    {t:'12/10 09:14',who:'Mariela Sosa',txt:'creó el evento Reunión de líderes 20/10'},
+  ];
+  return { people, teams, events, plans, templates, log, seq: n };
+}
+
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) } catch (e) { S = null }
+if (!S || !S.events) S = buildSeed();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)) } catch (e) {} }
+const uid = p => p + (S.seq++);
+
+const ROLES = { admin:{label:'Administración',user:'p0'}, lider:{label:'Líder de Alabanza',user:'p1'}, servidor:{label:'Servidor · Sonido',user:'p8'} };
+const UI = { role:'admin', view:'inicio', calMode:'semana', calAnchor:TODAY, planEvent:null, srvEvent:null, pq:'', pteam:'', pest:'activos', modal:null, csv:null };
+try { const r = localStorage.getItem(KEY + '-role'); if (r && ROLES[r]) UI.role = r } catch (e) {}
+
+/* ============ Utilidades ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const D = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) };
+const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const addDays = (s, k) => { const d = D(s); d.setDate(d.getDate() + k); return iso(d) };
+const daysFrom = s => Math.round((D(s) - D(TODAY)) / 864e5);
+const rel = s => { const k = daysFrom(s); return k === 0 ? 'Hoy' : k === 1 ? 'Mañana' : k > 1 ? 'En ' + k + ' días' : 'Hace ' + (-k) + ' días' };
+const fmtShort = s => { const d = D(s); return DOW[d.getDay()] + ' ' + d.getDate() + ' ' + MES[d.getMonth()] };
+const fmtTag = s => fmtShort(s).toUpperCase();
+const fmtLong = s => { const d = D(s); return DOWL[d.getDay()] + ' ' + d.getDate() + ' de ' + MESL[d.getMonth()] };
+const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m };
+const toTime = m => pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60);
+const endTime = e => toTime(toMin(e.time) + e.dur);
+const weekStart = s => addDays(s, -((D(s).getDay() + 6) % 7));
+const byDT = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
+
+const ev = id => S.events.find(e => e.id === id);
+const per = id => S.people.find(p => p.id === id);
+const team = id => S.teams.find(t => t.id === id);
+const fullName = p => p ? p.first + ' ' + p.last : '—';
+const nm = id => fullName(per(id));
+const ini = p => p ? (p.first[0] + p.last[0]).toUpperCase() : '?';
+const av = (p, cls = '') => `<span class="av ${cls}" aria-hidden="true">${esc(ini(p))}</span>`;
+const me = () => per(ROLES[UI.role].user);
+const myTeams = () => S.teams.filter(t => t.leader === me().id).map(t => t.id);
+const upcoming = () => S.events.filter(e => e.date >= TODAY).sort(byDT);
+const nextCulto = () => upcoming().find(e => e.type === 'culto');
+const evLabel = e => { const d = D(e.date); return e.title + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) };
+const isOpen = p => !p.person || p.status === 'rechazado';
+function stats(e, teamId){
+  const ps = e.positions.filter(p => !teamId || p.team === teamId);
+  return { total: ps.length, conf: ps.filter(p => p.status === 'confirmado').length, pend: ps.filter(p => p.status === 'pendiente').length, open: ps.filter(isOpen).length };
+}
+function lastServed(pid){
+  const past = S.events.filter(e => e.date < TODAY && e.positions.some(p => p.person === pid && p.status === 'confirmado')).sort(byDT);
+  return past.length ? past[past.length - 1].date : null;
+}
+function load30(pid){
+  return S.events.filter(e => e.date >= TODAY && daysFrom(e.date) <= 30).reduce((a, e) => a + e.positions.filter(p => p.person === pid && p.status !== 'rechazado').length, 0);
+}
+const overlap = (a, b) => a.date === b.date && toMin(a.time) < toMin(b.time) + b.dur && toMin(b.time) < toMin(a.time) + a.dur;
+
+function candidates(e, pos){
+  return S.people.filter(p => p.teams.includes(pos.team)).map(p => {
+    let reason = null;
+    if (!p.active) reason = 'Inactivo';
+    else if (p.id === pos.person && pos.status === 'rechazado') reason = 'Rechazó esta posición';
+    else if (p.blocked.includes(e.date)) reason = 'Marcó no disponible ese día';
+    else {
+      const dup = e.positions.find(x => x.person === p.id && x.id !== pos.id && x.status !== 'rechazado');
+      if (dup) reason = 'Ya sirve como ' + dup.role + ' en este evento';
+      else {
+        const clash = S.events.find(o => o.id !== e.id && overlap(o, e) && o.positions.some(x => x.person === p.id && x.status !== 'rechazado'));
+        if (clash) reason = 'Se superpone con ' + clash.title;
+      }
+    }
+    return { p, reason, last: lastServed(p.id), load: load30(p.id), current: p.id === pos.person && pos.status !== 'rechazado' };
+  }).sort((a, b) => (!!a.reason - !!b.reason) || (a.load - b.load));
+}
+
+function canEditTeam(teamId){ return UI.role === 'admin' || (UI.role === 'lider' && myTeams().includes(teamId)) }
+function log(txt){
+  const d = new Date();
+  S.log.unshift({ t: '13/10 ' + pad(d.getHours()) + ':' + pad(d.getMinutes()), who: fullName(me()), txt });
+  S.log = S.log.slice(0, 40);
+}
+let toastT;
+function toast(msg, sub = '', bad = false){
+  const t = $('#toast');
+  t.className = 'toast' + (bad ? ' bad' : '');
+  t.innerHTML = `<i></i><span>${esc(msg)}${sub ? ` <small>${esc(sub)}</small>` : ''}</span>`;
+  t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3600);
+}
+
+/* ============ Íconos ============ */
+const ICONS = {
+  home:'<path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/>',
+  cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  plan:'<path d="M9.5 6.5h10M9.5 12h10M9.5 17.5h10"/><circle cx="5" cy="6.5" r="1.2"/><circle cx="5" cy="12" r="1.2"/><circle cx="5" cy="17.5" r="1.2"/>',
+  srv:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.6 0 3.1.5 4.3 1.5"/><path d="m15 18 2.2 2.2L21.5 16"/>',
+  ppl:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.9c1.9.8 3.1 2.5 3.5 5.1"/>',
+  grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', up:'<path d="m6 14 6-6 6 6"/>', down:'<path d="m6 10 6 6 6-6"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>', trash:'<path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4h5v3"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>', left:'<path d="m14 6-6 6 6 6"/>', right:'<path d="m10 6 6 6-6 6"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>', copy:'<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+  dup:'<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M14 11.5v5M11.5 14h5M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+  upload:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 15v4a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-4"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5h4"/>', check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  tpl:'<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+};
+const ico = (k, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+
+function pill(s){
+  if (s === 'confirmado') return '<span class="pill ok">Confirmado</span>';
+  if (s === 'pendiente') return '<span class="pill warn">Pendiente</span>';
+  if (s === 'rechazado') return '<span class="pill bad">Rechazado</span>';
+  return '<span class="pill open">Sin cubrir</span>';
+}
+function covBar(st){
+  if (!st.total) return '<div class="cov"></div>';
+  return `<div class="cov" role="img" aria-label="${st.conf} confirmados, ${st.pend} pendientes, ${st.open} sin cubrir"><i class="c" style="flex:${st.conf}"></i><i class="p" style="flex:${st.pend}"></i><i class="o" style="flex:${st.open}"></i></div>`;
+}
+function miniBar(st){
+  if (!st.total) return '<span class="faint">Sin posiciones</span>';
+  return `<span class="mini"><i style="flex:${st.conf};background:var(--ok)"></i><i style="flex:${st.pend};background:var(--warn)"></i><i style="flex:${st.open}"></i></span>`;
+}
+const dateBox = s => { const d = D(s); return `<div class="datebox"><small>${DOW[d.getDay()].toUpperCase()}</small><b>${d.getDate()}</b></div>` };
+
+/* ============ Navegación ============ */
+const NAV = {
+  admin:[['inicio','Inicio','Inicio','home'],['calendario','Calendario','Agenda','cal'],['plan','Plan de culto','Plan','plan'],['servidores','Servidores','Servidores','srv'],['personas','Personas','Personas','ppl'],['equipos','Equipos','Equipos','grid']],
+  lider:[['inicio','Inicio','Inicio','home'],['calendario','Calendario','Agenda','cal'],['plan','Plan de culto','Plan','plan'],['servidores','Servidores','Servidores','srv'],['equipos','Mi equipo','Equipo','grid']],
+  servidor:[['inicio','Mis turnos','Turnos','home'],['calendario','Calendario','Agenda','cal'],['plan','Próximo culto','Culto','plan']],
+};
+const SUBS = {
+  inicio:{admin:'Panorama operativo de la semana',lider:'Tu equipo para los próximos cultos',servidor:'Tus asignaciones y el próximo culto'},
+  calendario:'Cultos y eventos de la iglesia', plan:'Orden del culto, tiempos y notas', servidores:'Asignaciones por equipo y estado de confirmación',
+  personas:'Base de personas de la iglesia', equipos:'Ministerios, líderes y roles',
+};
+
+function render(){
+  const nav = NAV[UI.role];
+  if (!nav.some(n => n[0] === UI.view)) UI.view = 'inicio';
+  const cur = nav.find(n => n[0] === UI.view);
+  $('#nav').innerHTML = nav.map(n => `<button data-a="go" data-v="${n[0]}" ${n[0] === UI.view ? 'aria-current="page"' : ''}>${ico(n[3])}${n[1]}</button>`).join('');
+  $('#tabbar').innerHTML = nav.map(n => `<button data-a="go" data-v="${n[0]}" ${n[0] === UI.view ? 'aria-current="page"' : ''}>${ico(n[3])}<span>${n[2]}</span></button>`).join('');
+  document.querySelectorAll('#roleSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.r === UI.role));
+  const m = me();
+  $('#who').innerHTML = `${av(m)}<div style="min-width:0"><b>${esc(fullName(m))}</b><small>${esc(ROLES[UI.role].label)}</small></div>`;
+  $('#pageTitle').textContent = cur[1];
+  const sub = SUBS[UI.view]; $('#pageSub').textContent = typeof sub === 'string' ? sub : sub[UI.role];
+  const V = { inicio: UI.role === 'admin' ? homeAdmin : UI.role === 'lider' ? homeLider : homeServidor, calendario: viewCal, plan: viewPlan, servidores: viewSrv, personas: viewPeople, equipos: viewTeams };
+  $('#main').innerHTML = V[UI.view]();
+  if (UI.view === 'personas') renderPeopleRows();
+  renderModal();
+}
+
+/* ============ Inicio: Admin ============ */
+function homeAdmin(){
+  const e = nextCulto(), st = stats(e), plan = S.plans[e.id];
+  const assigned = e.positions.filter(p => !isOpen(p)).length;
+  const steps = [
+    { t:'Culto creado', v: fmtShort(e.date) + ' · ' + e.time, done: true },
+    { t:'Plan armado', v: plan ? plan.items.length + ' elementos' : 'Sin plan', done: !!plan },
+    { t:'Servidores asignados', v: assigned + ' de ' + st.total, done: st.open === 0 },
+    { t:'Confirmaciones', v: st.conf + ' de ' + st.total, done: st.conf === st.total },
+  ];
+  const soon = upcoming().filter(x => daysFrom(x.date) <= 14);
+  const open = soon.flatMap(x => x.positions.filter(isOpen).map(p => ({ e: x, p })));
+  const pend = soon.flatMap(x => x.positions.filter(p => p.status === 'pendiente').map(p => ({ e: x, p })));
+  return `
+  <div class="quick">
+    <button data-a="newEvent">${ico('plus')}Nuevo evento</button>
+    <button data-a="go" data-v="plan" data-e="${e.id}">${ico('plan')}Armar plan</button>
+    <button data-a="go" data-v="servidores" data-e="${e.id}">${ico('srv')}Asignar servidores</button>
+    <button data-a="newPerson">${ico('ppl')}Agregar persona</button>
+  </div>
+  <section class="hero" aria-label="Próximo culto">
+    <div style="min-width:0">
+      <div class="eyebrow">Próximo culto · ${rel(e.date)}</div>
+      <h2>${esc(e.title)}</h2>
+      <div class="meta mono">${fmtTag(e.date)} · ${e.time}–${endTime(e)} · ${esc(e.place.toUpperCase())}</div>
+      ${covBar(st)}
+      <div class="legend"><span><i style="background:var(--ok)"></i>${st.conf} confirmados</span><span><i style="background:var(--warn)"></i>${st.pend} pendientes</span><span><i style="border:1px dashed var(--line-2)"></i>${st.open} sin cubrir</span></div>
+      <div class="flow">${steps.map((s, i) => `<div class="step ${s.done ? 'done' : ''}"><div class="k"><b>${s.done ? '✓' : i + 1}</b>${s.t}</div><div class="v">${s.v}</div></div>`).join('')}</div>
+      <div class="row" style="margin-top:18px"><button class="btn pri" data-a="go" data-v="servidores" data-e="${e.id}">Ver servidores</button><button class="btn" data-a="go" data-v="plan" data-e="${e.id}">Ver plan</button></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi ok"><span class="n">${st.conf}</span><span class="l">Servidores<br>confirmados</span></div>
+      <div class="kpi warn"><span class="n">${st.pend}</span><span class="l">Confirmaciones<br>pendientes</span></div>
+      <div class="kpi bad"><span class="n">${st.open}</span><span class="l">Roles<br>sin cubrir</span></div>
+    </div>
+  </section>
+  <div class="grid2">
+    <section class="panel"><div class="panel-h"><h2>Roles sin cubrir</h2><span class="count">PRÓX. 14 DÍAS · ${open.length}</span></div>
+      <ul class="rows">${open.length ? open.slice(0, 7).map(({ e: x, p }) => `<li><div class="grow"><div class="t">${esc(p.role)} <span class="faint">· ${esc(team(p.team).name)}</span></div><div class="s">${esc(evLabel(x))}${p.status === 'rechazado' ? ' · rechazó ' + esc(nm(p.person)) : ''}</div></div>${pill(p.status === 'rechazado' ? 'rechazado' : null)}<button class="btn sm" data-a="assign" data-e="${x.id}" data-p="${p.id}">Asignar</button></li>`).join('') : '<li class="empty">Todas las posiciones están cubiertas.</li>'}</ul>
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Confirmaciones pendientes</h2><span class="count">${pend.length}</span></div>
+      <ul class="rows">${pend.length ? pend.slice(0, 7).map(({ e: x, p }) => `<li>${av(per(p.person))}<div class="grow"><div class="t">${esc(nm(p.person))}</div><div class="s">${esc(p.role)} · ${esc(evLabel(x))}</div></div><button class="btn sm ghost" data-a="remind" data-e="${x.id}" data-p="${p.id}">${ico('bell')}Recordar</button></li>`).join('') : '<li class="empty">No hay confirmaciones pendientes.</li>'}</ul>
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Próximos eventos</h2><button class="btn sm ghost" data-a="go" data-v="calendario">Ver calendario</button></div>
+      <ul class="rows">${upcoming().slice(0, 5).map(x => { const s = stats(x); return `<li>${dateBox(x.date)}<button class="grow" style="all:unset;flex:1;min-width:0;cursor:pointer" data-a="evOpen" data-e="${x.id}"><div class="t">${esc(x.title)}</div><div class="s mono">${x.time} · ${esc(x.place)}</div></button>${s.total ? `<span class="mono faint" style="font-size:12px">${s.conf}/${s.total}</span>${miniBar(s)}` : '<span class="tag">Sin servidores</span>'}</li>` }).join('')}</ul>
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Actividad reciente</h2><span class="count">AUDITORÍA</span></div>
+      <ul class="rows">${S.log.slice(0, 6).map(l => `<li class="logi"><div class="grow"><b>${esc(l.who)}</b> <span class="muted">${esc(l.txt)}</span><time>${esc(l.t)}</time></div></li>`).join('')}</ul>
+    </section>
+  </div>`;
+}
+
+/* ============ Inicio: Líder ============ */
+function homeLider(){
+  const tid = myTeams()[0], t = team(tid), e = nextCulto(), st = stats(e, tid);
+  const pos = e.positions.filter(p => p.team === tid);
+  const members = S.people.filter(p => p.teams.includes(tid));
+  const evs = upcoming().filter(x => x.positions.some(p => p.team === tid));
+  return `
+  <section class="hero">
+    <div style="min-width:0">
+      <div class="eyebrow">${esc(t.name)} · Próximo culto · ${rel(e.date)}</div>
+      <h2>${esc(e.title)}</h2>
+      <div class="meta mono">${fmtTag(e.date)} · ${e.time} · ${esc(e.place.toUpperCase())}</div>
+      ${covBar(st)}
+      <div class="legend"><span><i style="background:var(--ok)"></i>${st.conf} confirmados</span><span><i style="background:var(--warn)"></i>${st.pend} pendientes</span><span><i style="border:1px dashed var(--line-2)"></i>${st.open} sin cubrir</span></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi ok"><span class="n">${st.conf}</span><span class="l">Confirmados</span></div>
+      <div class="kpi warn"><span class="n">${st.pend}</span><span class="l">Pendientes</span></div>
+      <div class="kpi bad"><span class="n">${st.open}</span><span class="l">Sin cubrir</span></div>
+    </div>
+  </section>
+  <section class="panel tgroup"><div class="panel-h"><h2>${esc(t.name)} · ${esc(evLabel(e))}</h2><button class="btn sm ghost" data-a="go" data-v="servidores" data-e="${e.id}">Ver todo</button></div>
+    <div>${pos.map(p => posRow(e, p)).join('')}</div>
+  </section>
+  <div class="grid2">
+    <section class="panel"><div class="panel-h"><h2>Disponibilidad · ${fmtShort(e.date)}</h2><span class="count">${members.length} INTEGRANTES</span></div>
+      <ul class="rows">${members.map(p => { const a = e.positions.find(x => x.person === p.id && x.status !== 'rechazado'); const blocked = p.blocked.includes(e.date); const status = !p.active ? '<span class="pill open">Inactivo</span>' : a ? `<span class="tag">${esc(a.role)}</span>` : blocked ? '<span class="pill bad">No disponible</span>' : '<span class="pill ok">Disponible</span>'; const ls = lastServed(p.id); return `<li>${av(p)}<div class="grow"><div class="t">${esc(fullName(p))}${p.id === t.leader ? ' <span class="pill acc">Líder</span>' : ''}</div><div class="s">${ls ? 'Sirvió el ' + fmtShort(ls) : 'Sin servicios recientes'} · ${load30(p.id)} turnos en 30 días</div></div>${status}</li>` }).join('')}</ul>
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Próximos eventos del equipo</h2></div>
+      <ul class="rows">${evs.map(x => { const s = stats(x, tid); return `<li>${dateBox(x.date)}<div class="grow"><div class="t">${esc(x.title)}</div><div class="s mono">${x.time} · ${s.conf}/${s.total} confirmados${s.open ? ' · ' + s.open + ' sin cubrir' : ''}</div></div>${miniBar(s)}<button class="btn sm" data-a="go" data-v="servidores" data-e="${x.id}">Gestionar</button></li>` }).join('')}</ul>
+    </section>
+  </div>`;
+}
+
+/* ============ Inicio: Servidor ============ */
+function homeServidor(){
+  const m = me();
+  const mine = upcoming().flatMap(e => e.positions.filter(p => p.person === m.id).map(p => ({ e, p })));
+  const pendN = mine.filter(x => x.p.status === 'pendiente').length;
+  const e = nextCulto(), plan = S.plans[e.id];
+  const leaders = [...new Set(m.teams.map(t => team(t).leader))].map(per);
+  return `
+  <div class="greet"><h2>Hola, ${esc(m.first)}</h2><p>${pendN ? `Tenés ${pendN} ${pendN === 1 ? 'asignación' : 'asignaciones'} para responder.` : 'Respondiste todas tus asignaciones. ¡Gracias por servir!'}</p></div>
+  <div class="mycards">${mine.length ? mine.map(({ e: x, p }) => `
+    <article class="mycard ${p.status === 'pendiente' ? 'pending' : ''}">
+      <div class="hd"><div><div class="eyebrow">${rel(x.date)}</div><h3>${esc(x.title)}</h3><div class="when">${fmtTag(x.date)} · ${x.time}–${endTime(x)} · ${esc(x.place)}</div></div>${pill(p.status)}</div>
+      <div class="role">${ico('srv')}<div><b>${esc(p.role)}</b> <span class="muted">· ${esc(team(p.team).name)}</span></div></div>
+      ${p.status === 'pendiente' ? `<div class="acts"><button class="btn okb lg" data-a="respond" data-e="${x.id}" data-p="${p.id}" data-s="confirmado">${ico('check')}Confirmar</button><button class="btn lg" data-a="rejectOpen" data-e="${x.id}" data-p="${p.id}">No puedo</button></div>`
+        : p.status === 'rechazado' ? `<div class="row"><span class="muted" style="font-size:13px">${p.note ? 'Motivo: ' + esc(p.note) : 'Avisaste que no podés.'}</span><span class="spacer"></span><button class="btn sm ghost" data-a="respond" data-e="${x.id}" data-p="${p.id}" data-s="pendiente">Cambiar respuesta</button></div>`
+        : `<div class="row"><button class="btn sm" data-a="go" data-v="plan" data-e="${x.id}">Ver orden del culto</button><span class="spacer"></span><button class="btn sm ghost" data-a="respond" data-e="${x.id}" data-p="${p.id}" data-s="pendiente">Cambiar respuesta</button></div>`}
+    </article>`).join('') : '<div class="panel empty">No tenés asignaciones próximas.</div>'}</div>
+  <div class="grid2">
+    <section class="panel"><div class="panel-h"><h2>Próximo culto · ${fmtShort(e.date)}</h2><button class="btn sm ghost" data-a="go" data-v="plan" data-e="${e.id}">Ver completo</button></div>
+      ${plan ? `<ul class="rows">${planTimes(e, plan).slice(0, 7).map(i => `<li><span class="mono" style="color:var(--accent);width:44px;flex:none">${i.at}</span><div class="grow"><div class="t">${esc(i.title)}</div><div class="s">${esc(i.resp || '—')} · ${i.dur} min</div></div></li>`).join('')}</ul>` : '<div class="empty">El plan todavía no está publicado.</div>'}
+    </section>
+    <section class="panel"><div class="panel-h"><h2>Contactar a tu líder</h2></div>
+      ${leaders.map(l => `<div class="contact">${av(l, 'lg')}<div class="grow" style="flex:1;min-width:0"><b>${esc(fullName(l))}</b><div class="muted" style="font-size:12.5px">Líder de ${esc(S.teams.filter(t => t.leader === l.id).map(t => t.name).join(', '))}</div>${l.phone ? `<div class="num" style="margin-top:4px">${esc(l.phone)}</div>` : '<div class="faint" style="margin-top:4px">Sin teléfono cargado</div>'}</div>${l.phone ? `<button class="btn sm" data-a="copy" data-v="${esc(l.phone)}">${ico('copy')}Copiar</button>` : ''}</div>`).join('')}
+      <div style="padding:0 16px 16px"><div class="note">Solo ves los datos de contacto que tu líder habilitó. Los demás datos personales quedan protegidos.</div></div>
+    </section>
+  </div>`;
+}
+
+/* ============ Fila de posición (Servidores / Líder) ============ */
+function posRow(e, p){
+  const editable = canEditTeam(p.team) && e.date >= TODAY;
+  const person = per(p.person);
+  const who = person
+    ? `${av(person)}<span><span class="${p.status === 'rechazado' ? 'strike' : ''}">${esc(fullName(person))}</span>${p.status === 'rechazado' && p.note ? `<small>${esc(p.note)}</small>` : ''}</span>`
+    : '<span class="faint">Sin asignar</span>';
+  let acts = '';
+  if (editable){
+    if (isOpen(p)) acts = `<button class="btn sm pri" data-a="assign" data-e="${e.id}" data-p="${p.id}">${p.status === 'rechazado' ? 'Reemplazar' : 'Asignar'}</button>`;
+    else acts = `${p.status === 'pendiente' ? `<button class="btn sm ghost" data-a="remind" data-e="${e.id}" data-p="${p.id}" title="Recordar">${ico('bell')}</button>` : ''}<button class="btn sm" data-a="assign" data-e="${e.id}" data-p="${p.id}">Cambiar</button><button class="icobtn" data-a="unassign" data-e="${e.id}" data-p="${p.id}" aria-label="Quitar asignación">${ico('x')}</button>`;
+    if (UI.role === 'admin' && isOpen(p) && !p.person) acts += `<button class="icobtn" data-a="delPos" data-e="${e.id}" data-p="${p.id}" aria-label="Eliminar posición">${ico('trash')}</button>`;
+  }
+  return `<div class="prow ${isOpen(p) ? 'open' : ''}"><div class="rl">${esc(p.role)}</div><div class="ps">${who}</div>${pill(p.status)}<div class="acts">${acts}</div></div>`;
+}
+
+/* ============ Calendario ============ */
+function evCard(e){
+  const mine = UI.role === 'servidor' ? e.positions.find(p => p.person === me().id) : null;
+  const s = stats(e);
+  return `<button class="evc ${e.type} ${mine ? 'mine' : ''}" data-a="evOpen" data-e="${e.id}">
+    <span class="tm">${e.time}–${endTime(e)}</span><span class="tt">${esc(e.title)}</span>
+    <span class="ft">${mine ? `<span class="tag" style="color:var(--warn)">Tu turno: ${esc(mine.role)}</span>` : UI.role !== 'servidor' && s.total ? `<span class="mono faint" style="font-size:11px">${s.conf}/${s.total}</span>${miniBar(s)}` : `<span class="faint" style="font-size:11.5px">${esc(e.place)}</span>`}</span>
+  </button>`;
+}
+function viewCal(){
+  const a = UI.calAnchor, isW = UI.calMode === 'semana';
+  let label, body;
+  if (isW){
+    const ws = weekStart(a), days = [...Array(7)].map((_, i) => addDays(ws, i));
+    const d0 = D(days[0]), d6 = D(days[6]);
+    label = d0.getMonth() === d6.getMonth() ? `${d0.getDate()} – ${d6.getDate()} de ${MESL[d6.getMonth()]}` : `${d0.getDate()} ${MES[d0.getMonth()]} – ${d6.getDate()} ${MES[d6.getMonth()]}`;
+    body = `<div class="week">${days.map(d => { const es = S.events.filter(e => e.date === d).sort(byDT); return `<div class="wday ${d === TODAY ? 'today' : ''}"><div class="wh"><span>${DOW[D(d).getDay()].toUpperCase()}</span><b>${D(d).getDate()}</b></div><div class="wb">${es.map(evCard).join('') || '<span class="none">—</span>'}</div></div>` }).join('')}</div>`;
+  } else {
+    const ad = D(a), y = ad.getFullYear(), mo = ad.getMonth();
+    const first = iso(new Date(y, mo, 1)), last = iso(new Date(y, mo + 1, 0));
+    const start = weekStart(first); const cells = []; let c = start;
+    while (c <= last || cells.length % 7) { cells.push(c); c = addDays(c, 1) }
+    label = `${MESL[mo][0].toUpperCase() + MESL[mo].slice(1)} ${y}`;
+    const monthEvs = S.events.filter(e => e.date >= first && e.date <= last).sort(byDT);
+    body = `<div class="month"><div class="mhead">${['LUN','MAR','MIÉ','JUE','VIE','SÁB','DOM'].map(x => `<div>${x}</div>`).join('')}</div><div class="mgrid">${cells.map(d => { const es = S.events.filter(e => e.date === d).sort(byDT); const out = D(d).getMonth() !== mo; return `<div class="mcell ${out ? 'out' : ''} ${d === TODAY ? 'today' : ''}"><span class="dn">${D(d).getDate()}</span><div class="evs" style="display:grid;gap:3px">${es.map(e => `<button class="mev ${e.type}" data-a="evOpen" data-e="${e.id}" title="${esc(e.time + ' ' + e.title)}"><i></i><span class="mono">${e.time}</span><span>${esc(e.title)}</span></button>`).join('')}</div></div>` }).join('')}</div></div>
+    <section class="panel mlist"><div class="panel-h"><h2>Eventos de ${MESL[mo]}</h2></div><ul class="rows">${monthEvs.map(e => `<li>${dateBox(e.date)}<button style="all:unset;flex:1;min-width:0;cursor:pointer" data-a="evOpen" data-e="${e.id}"><div class="t">${esc(e.title)}</div><div class="s mono">${e.time} · ${esc(e.place)}</div></button></li>`).join('')}</ul></section>`;
+  }
+  return `<div class="calbar">
+    <div class="seg"><button data-a="calMode" data-m="semana" aria-pressed="${isW}">Semana</button><button data-a="calMode" data-m="mes" aria-pressed="${!isW}">Mes</button></div>
+    <button class="icobtn" data-a="calNav" data-d="-1" aria-label="Anterior">${ico('left')}</button><button class="icobtn" data-a="calNav" data-d="1" aria-label="Siguiente">${ico('right')}</button>
+    <button class="btn sm" data-a="calToday">Hoy</button><h2>${label}</h2><span class="spacer"></span>
+    ${UI.role === 'admin' ? `<button class="btn pri" data-a="newEvent">${ico('plus')}Nuevo evento</button>` : ''}
+  </div>${body}`;
+}
+
+/* ============ Plan de culto ============ */
+function planTimes(e, plan){ let t = toMin(e.time); return plan.items.map(i => { const r = { ...i, at: toTime(t) }; t += Number(i.dur) || 0; return r }) }
+function eventChips(cur, act, filter = () => true){
+  return `<div class="chips" role="group" aria-label="Elegir evento">${upcoming().filter(filter).map(e => `<button class="chip" data-a="${act}" data-e="${e.id}" aria-pressed="${e.id === cur}"><small>${fmtTag(e.date)} · ${e.time}</small><b>${esc(e.title)}</b></button>`).join('')}</div>`;
+}
+function viewPlan(){
+  if (!UI.planEvent || !ev(UI.planEvent) || ev(UI.planEvent).date < TODAY) UI.planEvent = nextCulto().id;
+  const e = ev(UI.planEvent), plan = S.plans[e.id], edit = UI.role === 'admin';
+  const myRole = UI.role === 'servidor' ? e.positions.find(p => p.person === me().id) : null;
+  const teamsIn = [...new Set(e.positions.map(p => p.team))].map(team);
+  let content;
+  if (!plan){
+    content = `<div class="empty" style="padding:36px 18px;display:grid;gap:14px;justify-items:center"><div style="font-size:15px;color:var(--fg);font-weight:500">Este evento todavía no tiene plan</div><div>${edit ? 'Empezá desde una plantilla o agregá los elementos uno por uno.' : 'Cuando la administración lo publique, lo vas a ver acá.'}</div>${edit ? `<div class="row" style="justify-content:center">${S.templates.map(t => `<button class="btn" data-a="applyTpl" data-e="${e.id}" data-t="${t.id}">${ico('tpl')}${esc(t.name)}</button>`).join('')}<button class="btn ghost" data-a="addItem" data-e="${e.id}">${ico('plus')}En blanco</button></div>` : ''}</div>`;
+  } else {
+    const items = planTimes(e, plan), total = items.reduce((a, i) => a + Number(i.dur), 0), diff = total - e.dur;
+    const hiTitles = myRole ? ['Alabanza','Predicación','Mensaje'] : [];
+    content = `
+      <div class="strip" aria-hidden="true">${items.map(i => `<div style="flex:${i.dur}" class="${hiTitles.includes(i.title) && myRole && myRole.team === 'alabanza' ? 'hi' : ''}" title="${esc(i.title)} · ${i.dur} min">${esc(i.title)}</div>`).join('')}${diff < 0 ? `<div class="rest" style="flex:${-diff}">Libre</div>` : ''}</div>
+      <div class="durline"><span class="mono">${e.time} → ${toTime(toMin(e.time) + total)} · ${total} de ${e.dur} min</span>${diff > 0 ? `<span class="over">Se excede ${diff} min del horario previsto</span>` : `<span>${-diff} min de margen</span>`}</div>
+      <ol class="items">${items.map((i, k) => `<li>
+        <div class="at">${i.at}<small>${i.dur} min</small></div>
+        <div style="min-width:0"><div class="ti">${esc(i.title)}</div><div class="rp">${esc(i.resp || 'Sin responsable')}</div>${i.notes ? `<div class="nt">${esc(i.notes)}</div>` : ''}</div>
+        ${edit ? `<div class="ctl"><button class="icobtn" data-a="mvItem" data-e="${e.id}" data-i="${i.id}" data-d="-1" ${k === 0 ? 'disabled' : ''} aria-label="Subir">${ico('up')}</button><button class="icobtn" data-a="mvItem" data-e="${e.id}" data-i="${i.id}" data-d="1" ${k === items.length - 1 ? 'disabled' : ''} aria-label="Bajar">${ico('down')}</button><button class="icobtn" data-a="editItem" data-e="${e.id}" data-i="${i.id}" aria-label="Editar">${ico('edit')}</button><button class="icobtn" data-a="delItem" data-e="${e.id}" data-i="${i.id}" aria-label="Eliminar">${ico('trash')}</button></div>` : '<div></div>'}
+      </li>`).join('')}</ol>`;
+  }
+  return `${eventChips(e.id, 'pickPlan')}
+  <section class="panel">
+    <div class="planhead"><div style="min-width:0"><div class="eyebrow">${fmtTag(e.date)} · ${e.time}–${endTime(e)} · ${esc(e.place.toUpperCase())}</div><h2 style="margin-top:4px">${esc(e.title)}</h2>${e.desc ? `<p class="muted" style="margin-top:4px">${esc(e.desc)}</p>` : ''}
+      <div class="tags" style="margin-top:10px">${teamsIn.length ? teamsIn.map(t => `<span class="tag">${esc(t.name)}</span>`).join('') : '<span class="faint" style="font-size:12.5px">Sin equipos asignados</span>'}</div>
+      ${myRole ? `<div style="margin-top:10px"><span class="pill warn">Tu rol: ${esc(myRole.role)}</span></div>` : ''}</div>
+      ${edit && plan ? `<div class="row"><button class="btn" data-a="tplPick" data-e="${e.id}">${ico('tpl')}Plantilla</button><button class="btn" data-a="tplSave" data-e="${e.id}">Guardar como plantilla</button><button class="btn pri" data-a="addItem" data-e="${e.id}">${ico('plus')}Elemento</button></div>` : ''}
+    </div>
+    ${content}
+  </section>
+  ${!edit ? '<div class="note">Vista de solo lectura. La administración arma y edita el plan.</div>' : ''}`;
+}
+
+/* ============ Servidores ============ */
+function viewSrv(){
+  const filt = UI.role === 'lider' ? (x => x.positions.some(p => myTeams().includes(p.team))) : () => true;
+  if (!UI.srvEvent || !ev(UI.srvEvent) || ev(UI.srvEvent).date < TODAY || !filt(ev(UI.srvEvent))) UI.srvEvent = (upcoming().filter(filt).find(x => x.type === 'culto') || upcoming().filter(filt)[0]).id;
+  const e = ev(UI.srvEvent);
+  const tids = [...new Set(e.positions.map(p => p.team))].filter(t => UI.role !== 'lider' || myTeams().includes(t));
+  const st = UI.role === 'lider' ? stats(e, myTeams()[0]) : stats(e);
+  return `${eventChips(e.id, 'pickSrv', filt)}
+  <div class="sumbar">
+    <span class="pill ok">${st.conf} confirmados</span><span class="pill warn">${st.pend} pendientes</span><span class="pill open">${st.open} sin cubrir</span>
+    <span class="spacer"></span>
+    ${UI.role === 'admin' ? `<button class="btn" data-a="addPos" data-e="${e.id}">${ico('plus')}Agregar posición</button>` : ''}
+  </div>
+  ${tids.length ? tids.map(t => { const s = stats(e, t); return `<section class="panel tgroup"><div class="panel-h"><h2>${esc(team(t).name)} <span class="faint" style="font-weight:400;font-size:12.5px">· líder ${esc(nm(team(t).leader))}</span></h2><span class="row"><span class="mono faint" style="font-size:12px">${s.conf}/${s.total}</span>${miniBar(s)}</span></div><div>${e.positions.filter(p => p.team === t).map(p => posRow(e, p)).join('')}</div></section>` }).join('')
+    : `<div class="panel empty">Este evento no tiene posiciones de servicio.${UI.role === 'admin' ? ' Agregá una para empezar a asignar.' : ''}</div>`}
+  ${UI.role === 'lider' ? '<div class="note">Como líder ves y gestionás solo las posiciones de tu equipo. El backend valida cada permiso.</div>' : ''}`;
+}
+
+/* ============ Personas ============ */
+function viewPeople(){
+  return `<div class="toolbar">
+    <div class="search">${ico('search')}<input type="search" id="pq" placeholder="Buscar por nombre, teléfono o email" value="${esc(UI.pq)}" aria-label="Buscar personas"></div>
+    <select id="pteam" aria-label="Filtrar por equipo" style="width:auto"><option value="">Todos los equipos</option>${S.teams.map(t => `<option value="${t.id}" ${UI.pteam === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}<option value="__none" ${UI.pteam === '__none' ? 'selected' : ''}>Sin equipo</option></select>
+    <div class="seg">${[['activos','Activos'],['inactivos','Inactivos'],['todos','Todos']].map(([k, l]) => `<button data-a="pest" data-k="${k}" aria-pressed="${UI.pest === k}">${l}</button>`).join('')}</div>
+    <button class="btn" data-a="importOpen">${ico('upload')}Importar CSV</button>
+    <button class="btn pri" data-a="newPerson">${ico('plus')}Agregar persona</button>
+  </div>
+  <section class="panel"><div class="panel-h"><h2>Personas</h2><span class="count" id="pcount"></span></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Equipos</th><th>Teléfono</th><th>Último servicio</th><th>Estado</th><th></th></tr></thead><tbody id="prows"></tbody></table></div>
+  </section>
+  <div class="note">Datos ficticios de demostración. La baja es lógica: la persona queda inactiva y conserva su historial.</div>`;
+}
+function renderPeopleRows(){
+  const q = UI.pq.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const list = S.people.filter(p => {
+    if (UI.pest === 'activos' && !p.active) return false;
+    if (UI.pest === 'inactivos' && p.active) return false;
+    if (UI.pteam === '__none' && p.teams.length) return false;
+    if (UI.pteam && UI.pteam !== '__none' && !p.teams.includes(UI.pteam)) return false;
+    if (q){ const hay = (fullName(p) + ' ' + p.phone + ' ' + p.email).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); if (!hay.includes(q)) return false }
+    return true;
+  }).sort((a, b) => a.last.localeCompare(b.last));
+  $('#pcount').textContent = list.length + ' DE ' + S.people.length;
+  $('#prows').innerHTML = list.length ? list.map(p => { const ls = lastServed(p.id); return `<tr class="${p.active ? '' : 'inactive'}">
+    <td><div class="who">${av(p)}<div style="min-width:0"><b>${esc(fullName(p))}</b><small>${esc(p.email || 'Sin email')}</small></div></div></td>
+    <td class="c-teams"><div class="tags">${p.teams.map(t => `<span class="tag">${esc(team(t).name)}${team(t).leader === p.id ? ' · líder' : ''}</span>`).join('') || '<span class="faint" style="font-size:12px">Sin equipo</span>'}</div></td>
+    <td class="c-phone mono" style="font-size:12.5px">${esc(p.phone)}</td>
+    <td class="c-last muted" style="font-size:12.5px">${ls ? fmtShort(ls) : ''}</td>
+    <td>${p.active ? '<span class="pill ok">Activo</span>' : '<span class="pill open">Inactivo</span>'}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn sm ghost" data-a="editPerson" data-id="${p.id}">Editar</button></td>
+  </tr>` }).join('') : `<tr><td colspan="6" class="empty">No hay personas que coincidan con la búsqueda.</td></tr>`;
+}
+
+/* ============ Equipos ============ */
+function viewTeams(){
+  const e = nextCulto();
+  const list = UI.role === 'lider' ? S.teams.filter(t => myTeams().includes(t.id)) : S.teams;
+  return `<div class="teams">${list.map(t => { const n = S.people.filter(p => p.teams.includes(t.id) && p.active).length; const s = stats(e, t.id); return `<button class="teamc" data-a="teamOpen" data-t="${t.id}">
+    <div><h3>${esc(t.name)}</h3><div class="ld">Líder: ${esc(nm(t.leader))} · ${n} activos</div></div>
+    <div class="tags">${t.roles.slice(0, 4).map(r => `<span class="tag">${esc(r)}</span>`).join('')}${t.roles.length > 4 ? `<span class="tag">+${t.roles.length - 4}</span>` : ''}</div>
+    <div class="ft"><span>${fmtShort(e.date)}: ${s.total ? s.conf + '/' + s.total + ' confirmados' : 'sin posiciones'}</span>${s.total ? miniBar(s) : ''}</div>
+  </button>` }).join('')}</div>`;
+}
+
+/* ============ Modales ============ */
+const mHead = (eyebrow, title) => `<div class="m-h"><div style="min-width:0">${eyebrow ? `<div class="eyebrow">${eyebrow}</div>` : ''}<h3>${title}</h3></div><button class="icobtn" data-a="close" aria-label="Cerrar">${ico('x')}</button></div>`;
+function openModal(type, data = {}){ UI.modal = { type, ...data }; renderModal(); const f = $('#modal input:not([type=checkbox]),#modal textarea'); if (f && matchMedia('(min-width:861px)').matches) f.focus() }
+function closeModal(){ UI.modal = null; UI.csv = null; renderModal() }
+function renderModal(){
+  const m = $('#modal');
+  if (!UI.modal){ m.hidden = true; m.innerHTML = ''; return }
+  const M = { assign: mAssign, ev: mEvent, evForm: mEventForm, person: mPerson, item: mItem, tplPick: mTplPick, tplSave: mTplSave, reject: mReject, addPos: mAddPos, team: mTeam, import: mImport };
+  m.innerHTML = `<div class="dlg" role="dialog" aria-modal="true">${M[UI.modal.type](UI.modal)}</div>`;
+  m.hidden = false;
+}
+
+function mAssign({ e: eid, p: pid }){
+  const e = ev(eid), pos = e.positions.find(x => x.id === pid), cs = candidates(e, pos);
+  return `${mHead(esc(team(pos.team).name) + ' · ' + esc(evLabel(e)), 'Asignar ' + esc(pos.role))}
+  <div class="m-b"><ul class="cand">${cs.map(c => `<li><button data-a="doAssign" data-e="${eid}" data-p="${pid}" data-person="${c.p.id}" ${c.reason || c.current ? 'disabled' : ''}>${av(c.p)}<span class="nm"><b>${esc(fullName(c.p))}</b><small>${c.reason ? esc(c.reason) : (c.last ? 'Último servicio: ' + fmtShort(c.last) : 'Sin servicios recientes') + ' · ' + c.load + ' turnos en 30 días'}</small></span>${c.current ? '<span class="pill acc">Actual</span>' : c.reason ? '<span class="pill open">No disponible</span>' : '<span class="pill ok">Disponible</span>'}</button></li>`).join('') || '<li class="empty">Este equipo no tiene integrantes.</li>'}</ul>
+  <p class="hint">Se bloquean duplicados en el mismo evento, superposiciones de horario, personas inactivas y fechas marcadas como no disponibles.</p></div>`;
+}
+function mEvent({ e: eid }){
+  const e = ev(eid), tids = [...new Set(e.positions.map(p => p.team))], admin = UI.role === 'admin', past = e.date < TODAY;
+  return `${mHead((e.type === 'culto' ? 'Culto' : 'Evento') + ' · ' + rel(e.date), esc(e.title))}
+  <div class="m-b">
+    <dl class="kv"><dt>Fecha</dt><dd>${fmtLong(e.date)}</dd><dt>Horario</dt><dd class="mono">${e.time} – ${endTime(e)}</dd><dt>Lugar</dt><dd>${esc(e.place)}</dd>${e.desc ? `<dt>Descripción</dt><dd>${esc(e.desc)}</dd>` : ''}<dt>Plan</dt><dd>${S.plans[e.id] ? S.plans[e.id].items.length + ' elementos' : '<span class="faint">Sin plan</span>'}</dd></dl>
+    <div><div class="eyebrow" style="margin-bottom:8px">Equipos asignados</div>
+    ${tids.length ? `<ul class="rows panel">${tids.map(t => { const s = stats(e, t); return `<li><div class="grow"><div class="t">${esc(team(t).name)}</div><div class="s">${s.conf} confirmados · ${s.pend} pendientes · ${s.open} sin cubrir</div></div>${miniBar(s)}</li>` }).join('')}</ul>` : '<div class="faint" style="font-size:13px">Sin equipos asignados.</div>'}</div>
+  </div>
+  <div class="m-f">
+    ${admin && !past ? `<button class="btn ghost" data-a="dupEvent" data-e="${e.id}">${ico('dup')}Duplicar a la semana siguiente</button><button class="btn ghost" data-a="editEvent" data-e="${e.id}">${ico('edit')}Editar</button>` : ''}
+    ${!past ? `<button class="btn" data-a="go" data-v="plan" data-e="${e.id}">Ver plan</button>${UI.role !== 'servidor' ? `<button class="btn pri" data-a="go" data-v="servidores" data-e="${e.id}">Servidores</button>` : ''}` : '<span class="muted" style="font-size:12.5px">Evento finalizado</span>'}
+  </div>`;
+}
+function mEventForm({ e: eid, err }){
+  const e = eid ? ev(eid) : { title:'', type:'culto', date:'2026-11-01', time:'10:00', dur:100, place:'Templo principal', desc:'' };
+  const def = ['alabanza','sonido','multimedia','recepcion'];
+  return `${mHead(eid ? 'Editar' : 'Nuevo', eid ? esc(e.title) : 'Crear culto o evento')}
+  <form data-form="event" data-e="${eid || ''}" novalidate><div class="m-b">
+    <div class="f2"><div class="field"><label for="f-title">Nombre</label><input type="text" id="f-title" name="title" value="${esc(e.title)}" placeholder="Ej.: Culto dominical"></div>
+    <div class="field"><label for="f-type">Tipo</label><select id="f-type" name="type"><option value="culto" ${e.type === 'culto' ? 'selected' : ''}>Culto</option><option value="evento" ${e.type === 'evento' ? 'selected' : ''}>Evento</option></select></div></div>
+    <div class="f3"><div class="field"><label for="f-date">Fecha</label><input type="date" id="f-date" name="date" value="${e.date}"></div><div class="field"><label for="f-time">Hora</label><input type="time" id="f-time" name="time" value="${e.time}"></div><div class="field"><label for="f-dur">Duración (min)</label><input type="number" id="f-dur" name="dur" min="15" max="600" step="5" value="${e.dur}"></div></div>
+    <div class="field"><label for="f-place">Ubicación</label><input type="text" id="f-place" name="place" value="${esc(e.place)}"></div>
+    <div class="field"><label for="f-desc">Descripción (opcional)</label><textarea id="f-desc" name="desc" rows="2">${esc(e.desc)}</textarea></div>
+    ${eid ? '<p class="hint">Las posiciones de servicio se gestionan desde Servidores.</p>' : `<div class="field"><span class="lb">Equipos que sirven</span><div class="checks">${S.teams.map(t => `<label><input type="checkbox" name="teams" value="${t.id}" ${def.includes(t.id) ? 'checked' : ''}>${esc(t.name)}</label>`).join('')}</div><p class="hint">Se crean las posiciones de cada equipo, listas para asignar.</p></div>`}
+    <p class="hint">Hora de Argentina (UTC−3).</p>
+    ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ''}
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button type="submit" class="btn pri">${eid ? 'Guardar cambios' : 'Crear'}</button></div></form>`;
+}
+function mPerson({ id, err }){
+  const p = id ? per(id) : { first:'', last:'', phone:'', email:'', teams:[], active:true };
+  return `${mHead(id ? 'Editar persona' : 'Nueva persona', id ? esc(fullName(p)) : 'Agregar persona')}
+  <form data-form="person" data-id="${id || ''}" novalidate><div class="m-b">
+    <div class="f2"><div class="field"><label for="p-first">Nombre</label><input type="text" id="p-first" name="first" value="${esc(p.first)}" autocomplete="off"></div><div class="field"><label for="p-last">Apellido</label><input type="text" id="p-last" name="last" value="${esc(p.last)}" autocomplete="off"></div></div>
+    <div class="f2"><div class="field"><label for="p-phone">Teléfono (opcional)</label><input type="tel" id="p-phone" name="phone" value="${esc(p.phone)}" placeholder="+54 9 11 …"></div><div class="field"><label for="p-email">Email (opcional)</label><input type="email" id="p-email" name="email" value="${esc(p.email)}"></div></div>
+    <div class="field"><span class="lb">Equipos</span><div class="checks">${S.teams.map(t => `<label><input type="checkbox" name="teams" value="${t.id}" ${p.teams.includes(t.id) ? 'checked' : ''}>${esc(t.name)}</label>`).join('')}</div></div>
+    ${id ? `<div class="checks"><label><input type="checkbox" name="active" ${p.active ? 'checked' : ''}>Persona activa</label></div>` : ''}
+    ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ''}
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button type="submit" class="btn pri">${id ? 'Guardar' : 'Agregar'}</button></div></form>`;
+}
+function mItem({ e: eid, i: iid, err }){
+  const it = iid ? S.plans[eid].items.find(x => x.id === iid) : { title:'', dur:5, resp:'', notes:'' };
+  return `${mHead(esc(evLabel(ev(eid))), iid ? 'Editar elemento' : 'Agregar elemento')}
+  <form data-form="item" data-e="${eid}" data-i="${iid || ''}" novalidate><div class="m-b">
+    <div class="f2"><div class="field"><label for="i-title">Elemento</label><input type="text" id="i-title" name="title" value="${esc(it.title)}" placeholder="Ej.: Santa Cena" list="i-sug"><datalist id="i-sug">${['Bienvenida','Alabanza','Oración','Lectura','Anuncios','Ofrenda','Santa Cena','Predicación','Cierre y bendición'].map(x => `<option value="${x}">`).join('')}</datalist></div>
+    <div class="field"><label for="i-dur">Duración (min)</label><input type="number" id="i-dur" name="dur" min="1" max="180" value="${it.dur}"></div></div>
+    <div class="field"><label for="i-resp">Responsable</label><input type="text" id="i-resp" name="resp" value="${esc(it.resp)}" placeholder="Persona o equipo"></div>
+    <div class="field"><label for="i-notes">Notas para los responsables</label><textarea id="i-notes" name="notes" rows="3">${esc(it.notes)}</textarea></div>
+    ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ''}
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button type="submit" class="btn pri">Guardar</button></div></form>`;
+}
+function mTplPick({ e: eid }){
+  const cur = S.plans[eid];
+  return `${mHead(esc(evLabel(ev(eid))), 'Aplicar plantilla')}<div class="m-b">
+    ${cur ? `<div class="note">Reemplaza los ${cur.items.length} elementos actuales del plan.</div>` : ''}
+    <ul class="cand">${S.templates.map(t => `<li><button data-a="applyTpl" data-e="${eid}" data-t="${t.id}">${ico('tpl')}<span class="nm"><b>${esc(t.name)}</b><small>${t.items.map(i => i.title).join(' · ')}</small></span><span class="mono faint" style="font-size:12px">${t.items.reduce((a, i) => a + Number(i.dur), 0)} min</span></button></li>`).join('')}</ul></div>`;
+}
+function mTplSave({ e: eid, err }){
+  return `${mHead(esc(evLabel(ev(eid))), 'Guardar como plantilla')}<form data-form="tpl" data-e="${eid}" novalidate><div class="m-b">
+    <div class="field"><label for="t-name">Nombre de la plantilla</label><input type="text" id="t-name" name="name" value="${esc(ev(eid).title)} (copia)"></div>
+    <p class="hint">Se guardan los elementos, duraciones y responsables. Las notas no se copian.</p>
+    ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ''}
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button type="submit" class="btn pri">Guardar plantilla</button></div></form>`;
+}
+function mReject({ e: eid, p: pid }){
+  const e = ev(eid), pos = e.positions.find(x => x.id === pid);
+  return `${mHead(esc(pos.role) + ' · ' + esc(evLabel(e)), 'Avisar que no podés')}<form data-form="reject" data-e="${eid}" data-p="${pid}"><div class="m-b">
+    <p class="muted">Tu líder va a ver el aviso y buscará un reemplazo.</p>
+    <div class="field"><label for="r-note">Motivo (opcional)</label><textarea id="r-note" name="note" rows="3" placeholder="Ej.: Estoy de viaje ese fin de semana"></textarea></div>
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Volver</button><button type="submit" class="btn pri">Enviar respuesta</button></div></form>`;
+}
+function mAddPos({ e: eid, t: tsel }){
+  const tid = tsel || S.teams[0].id;
+  return `${mHead(esc(evLabel(ev(eid))), 'Agregar posición')}<form data-form="addPos" data-e="${eid}"><div class="m-b">
+    <div class="f2"><div class="field"><label for="a-team">Equipo</label><select id="a-team" name="team" data-change="posTeam">${S.teams.map(t => `<option value="${t.id}" ${t.id === tid ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></div>
+    <div class="field"><label for="a-role">Rol</label><select id="a-role" name="role">${team(tid).roles.map(r => `<option>${esc(r)}</option>`).join('')}</select></div></div>
+  </div><div class="m-f"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button type="submit" class="btn pri">Agregar</button></div></form>`;
+}
+function mTeam({ t: tid }){
+  const t = team(tid), e = nextCulto(), edit = canEditTeam(tid), admin = UI.role === 'admin';
+  const members = S.people.filter(p => p.teams.includes(tid)).sort((a, b) => (b.id === t.leader) - (a.id === t.leader) || a.last.localeCompare(b.last));
+  const others = S.people.filter(p => p.active && !p.teams.includes(tid)).sort((a, b) => a.last.localeCompare(b.last));
+  return `${mHead('Equipo', esc(t.name))}<div class="m-b">
+    <div><div class="eyebrow" style="margin-bottom:8px">Roles</div><div class="tags">${t.roles.map(r => `<span class="tag">${esc(r)}</span>`).join('')}</div>
+    ${admin ? `<form data-form="role" data-t="${tid}" class="row" style="margin-top:10px"><input type="text" name="role" placeholder="Nuevo rol" style="flex:1;min-width:140px" aria-label="Nuevo rol"><button class="btn sm" type="submit">Agregar rol</button></form>` : ''}</div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Integrantes · disponibilidad para el ${fmtShort(e.date)}</div>
+    <ul class="rows panel">${members.map(p => { const a = e.positions.find(x => x.person === p.id && x.status !== 'rechazado'); const st = !p.active ? '<span class="pill open">Inactivo</span>' : a ? `<span class="tag">${esc(a.role)}</span>` : p.blocked.includes(e.date) ? '<span class="pill bad">No disponible</span>' : '<span class="pill ok">Disponible</span>'; return `<li>${av(p)}<div class="grow"><div class="t">${esc(fullName(p))}${p.id === t.leader ? ' <span class="pill acc">Líder</span>' : ''}</div></div>${st}${admin && p.id !== t.leader && p.active ? `<button class="btn sm ghost" data-a="setLeader" data-t="${tid}" data-id="${p.id}">Hacer líder</button>` : ''}${edit && p.id !== t.leader ? `<button class="icobtn" data-a="rmMember" data-t="${tid}" data-id="${p.id}" aria-label="Quitar del equipo">${ico('x')}</button>` : ''}</li>` }).join('')}</ul></div>
+    ${edit ? `<form data-form="member" data-t="${tid}" class="row"><select name="id" style="flex:1;min-width:160px" aria-label="Persona a sumar">${others.map(p => `<option value="${p.id}">${esc(fullName(p))}</option>`).join('')}</select><button class="btn" type="submit">${ico('plus')}Sumar al equipo</button></form>` : ''}
+  </div>`;
+}
+const CSV_SAMPLE = `nombre,apellido,telefono,email,equipos
+Paula,Giménez,+54 9 11 5555-0190,paula.gimenez@ejemplo.org,Recepción
+Lautaro,Pereyra,,lautaro@ejemplo,Sonido
+,Rivas,,,Niños
+Florencia,Aguirre,,,Alabanza;Multimedia
+Camila,Ortiz,+54 9 11 5555-0106,,Alabanza`;
+function parseCSV(txt){
+  const lines = txt.trim().split(/\r?\n/).filter(Boolean);
+  if (!lines.length) return [];
+  const head = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const idx = k => head.indexOf(k);
+  return lines.slice(1).map((ln, k) => {
+    const c = ln.split(',').map(x => x.trim());
+    const r = { line: k + 2, first: c[idx('nombre')] || '', last: c[idx('apellido')] || '', phone: c[idx('telefono')] || '', email: c[idx('email')] || '', teamsRaw: c[idx('equipos')] || '' };
+    const names = r.teamsRaw ? r.teamsRaw.split(';').map(x => x.trim()).filter(Boolean) : [];
+    r.teams = names.map(n => S.teams.find(t => t.name.toLowerCase() === n.toLowerCase())).filter(Boolean).map(t => t.id);
+    if (!r.first || !r.last) r.err = 'Falta nombre o apellido';
+    else if (r.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)) r.err = 'Email inválido';
+    else if (r.teams.length !== names.length) r.err = 'Equipo desconocido';
+    else if (S.people.some(p => fullName(p).toLowerCase() === (r.first + ' ' + r.last).toLowerCase())) r.err = 'Ya existe (posible duplicado)';
+    return r;
+  });
+}
+function mImport(){
+  const rows = UI.csv, ok = rows ? rows.filter(r => !r.err) : [];
+  return `${mHead('Personas', 'Importar CSV')}<div class="m-b">
+    <div class="note">Importación controlada: primero revisás la vista previa y después confirmás. Solo se importan las filas válidas.</div>
+    <div class="field"><label for="csv">Pegá el contenido del CSV (columnas: nombre, apellido, telefono, email, equipos)</label><textarea id="csv" rows="7" class="mono" style="font-size:12px">${esc(UI.csvText ?? CSV_SAMPLE)}</textarea></div>
+    ${rows ? `<div class="panel tblwrap"><table class="tbl" style="font-size:12.5px"><thead><tr><th>Fila</th><th>Persona</th><th>Resultado</th></tr></thead><tbody>${rows.map(r => `<tr><td class="mono faint">${r.line}</td><td>${esc((r.first + ' ' + r.last).trim() || '—')}<div class="faint" style="font-size:11.5px">${esc(r.teamsRaw)}</div></td><td>${r.err ? `<span class="pill bad">${esc(r.err)}</span>` : '<span class="pill ok">Lista para importar</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}
+  </div><div class="m-f"><button class="btn ghost" data-a="close">Cancelar</button><button class="btn" data-a="csvPreview">Revisar</button><button class="btn pri" data-a="csvImport" ${ok.length ? '' : 'disabled'}>Importar ${ok.length || ''} ${ok.length === 1 ? 'persona' : 'personas'}</button></div>`;
+}
+
+/* ============ Acciones ============ */
+const A = {
+  go: d => { UI.view = d.v; if (d.e){ if (d.v === 'plan') UI.planEvent = d.e; if (d.v === 'servidores') UI.srvEvent = d.e } UI.modal = null; render(); window.scrollTo(0, 0) },
+  role: d => { UI.role = d.r; UI.modal = null; try { localStorage.setItem(KEY + '-role', d.r) } catch (e) {} render() },
+  reset: () => { S = buildSeed(); save(); UI.modal = null; render(); toast('Demo restablecida', 'Datos ficticios originales') },
+  close: () => closeModal(),
+  assign: d => openModal('assign', { e: d.e, p: d.p }),
+  doAssign: d => {
+    const e = ev(d.e), pos = e.positions.find(x => x.id === d.p), prev = pos.person;
+    pos.person = d.person; pos.status = 'pendiente'; pos.note = '';
+    log(`${prev ? 'reemplazó a ' + nm(prev) + ' por' : 'asignó a'} ${nm(d.person)} en ${pos.role} · ${evLabel(e)}`);
+    save(); closeModal(); render(); toast(`${nm(d.person)} asignado como ${pos.role}`, 'Aviso simulado: la demo no envía mensajes');
+  },
+  unassign: d => { const e = ev(d.e), pos = e.positions.find(x => x.id === d.p); log(`quitó a ${nm(pos.person)} de ${pos.role} · ${evLabel(e)}`); pos.person = null; pos.status = null; pos.note = ''; save(); render(); toast('Asignación quitada') },
+  delPos: d => { const e = ev(d.e), pos = e.positions.find(x => x.id === d.p); e.positions = e.positions.filter(x => x.id !== d.p); log(`eliminó la posición ${pos.role} · ${evLabel(e)}`); save(); render(); toast('Posición eliminada') },
+  remind: d => { const e = ev(d.e), pos = e.positions.find(x => x.id === d.p); log(`envió recordatorio a ${nm(pos.person)} · ${evLabel(e)}`); save(); render(); toast(`Recordatorio para ${nm(pos.person)}`, 'Simulado, sin envío real') },
+  respond: d => {
+    const e = ev(d.e), pos = e.positions.find(x => x.id === d.p);
+    pos.status = d.s; if (d.s !== 'rechazado') pos.note = '';
+    log(`${d.s === 'confirmado' ? 'confirmó' : 'reabrió su respuesta de'} ${pos.role} · ${evLabel(e)}`);
+    save(); render(); toast(d.s === 'confirmado' ? '¡Gracias! Confirmaste tu participación' : 'Respuesta reabierta', d.s === 'confirmado' ? evLabel(e) : 'Volvé a confirmar cuando sepas');
+  },
+  rejectOpen: d => openModal('reject', { e: d.e, p: d.p }),
+  evOpen: d => openModal('ev', { e: d.e }),
+  newEvent: () => openModal('evForm', {}),
+  editEvent: d => openModal('evForm', { e: d.e }),
+  dupEvent: d => {
+    const e = ev(d.e), nd = addDays(e.date, 7);
+    const clash = S.events.find(x => x.date === nd && x.title === e.title);
+    if (clash){ toast(`Ya existe «${e.title}» el ${fmtShort(nd)}`, 'No se duplicó', true); return }
+    const id = uid('e');
+    S.events.push({ ...e, id, date: nd, positions: e.positions.map(p => ({ id: uid('q'), team: p.team, role: p.role, person: null, status: null, note: '' })) });
+    if (S.plans[e.id]) S.plans[id] = { items: S.plans[e.id].items.map(i => ({ ...i, id: uid('i') })) };
+    log(`duplicó ${evLabel(e)} al ${fmtShort(nd)}`); save(); openModal('ev', { e: id }); render(); toast(`Duplicado al ${fmtShort(nd)}`, 'Posiciones creadas sin asignar');
+  },
+  calMode: d => { UI.calMode = d.m; render() },
+  calNav: d => { const k = Number(d.d); if (UI.calMode === 'semana') UI.calAnchor = addDays(UI.calAnchor, 7 * k); else { const a = D(UI.calAnchor); UI.calAnchor = iso(new Date(a.getFullYear(), a.getMonth() + k, 1)) } render() },
+  calToday: () => { UI.calAnchor = TODAY; render() },
+  pickPlan: d => { UI.planEvent = d.e; render() },
+  pickSrv: d => { UI.srvEvent = d.e; render() },
+  addItem: d => openModal('item', { e: d.e }),
+  editItem: d => openModal('item', { e: d.e, i: d.i }),
+  delItem: d => { const pl = S.plans[d.e], it = pl.items.find(x => x.id === d.i); pl.items = pl.items.filter(x => x.id !== d.i); if (!pl.items.length) delete S.plans[d.e]; log(`quitó «${it.title}» del plan · ${evLabel(ev(d.e))}`); save(); render(); toast('Elemento eliminado') },
+  mvItem: d => { const its = S.plans[d.e].items, k = its.findIndex(x => x.id === d.i), j = k + Number(d.d); if (j < 0 || j >= its.length) return; [its[k], its[j]] = [its[j], its[k]]; save(); render() },
+  tplPick: d => openModal('tplPick', { e: d.e }),
+  tplSave: d => openModal('tplSave', { e: d.e }),
+  applyTpl: d => { const t = S.templates.find(x => x.id === d.t); S.plans[d.e] = { items: t.items.map(i => ({ ...i, id: uid('i') })) }; log(`aplicó la plantilla «${t.name}» · ${evLabel(ev(d.e))}`); save(); closeModal(); render(); toast(`Plantilla «${t.name}» aplicada`) },
+  addPos: d => openModal('addPos', { e: d.e }),
+  teamOpen: d => openModal('team', { t: d.t }),
+  setLeader: d => { const t = team(d.t); t.leader = d.id; log(`designó a ${nm(d.id)} como líder de ${t.name}`); save(); render(); toast(`${nm(d.id)} ahora lidera ${t.name}`) },
+  rmMember: d => { const p = per(d.id); p.teams = p.teams.filter(x => x !== d.t); log(`quitó a ${fullName(p)} de ${team(d.t).name}`); save(); render(); toast(`${fullName(p)} salió de ${team(d.t).name}`) },
+  newPerson: () => openModal('person', {}),
+  editPerson: d => openModal('person', { id: d.id }),
+  pest: d => { UI.pest = d.k; document.querySelectorAll('[data-a="pest"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === d.k)); renderPeopleRows() },
+  importOpen: () => { UI.csv = null; UI.csvText = CSV_SAMPLE; openModal('import') },
+  csvPreview: () => { UI.csvText = $('#csv').value; UI.csv = parseCSV(UI.csvText); renderModal() },
+  csvImport: () => {
+    const ok = (UI.csv || []).filter(r => !r.err);
+    ok.forEach(r => S.people.push({ id: uid('p'), first: r.first, last: r.last, phone: r.phone, email: r.email, teams: r.teams, active: true, blocked: [] }));
+    log(`importó ${ok.length} personas desde CSV`); save(); closeModal(); render(); toast(`${ok.length} personas importadas`, 'Las filas con errores no se importaron');
+  },
+  copy: (d) => {
+    const done = () => toast('Número copiado', d.v);
+    try { navigator.clipboard.writeText(d.v).then(done, () => toast('Seleccioná el número para copiarlo', '', true)) } catch (e) { toast('Seleccioná el número para copiarlo', '', true) }
+  },
+};
+
+const F = {
+  event: (f, data) => {
+    const eid = f.dataset.e, g = n => (data.get(n) || '').toString().trim();
+    const v = { title: g('title'), type: g('type'), date: g('date'), time: g('time'), dur: Number(g('dur')), place: g('place'), desc: g('desc') };
+    let err = !v.title ? 'Ingresá un nombre.' : !/^\d{4}-\d{2}-\d{2}$/.test(v.date) ? 'Elegí una fecha.' : !/^\d{2}:\d{2}$/.test(v.time) ? 'Elegí una hora.' : !(v.dur >= 15 && v.dur <= 600) ? 'La duración tiene que estar entre 15 y 600 minutos.' : !v.place ? 'Indicá la ubicación.' : v.date < TODAY ? 'La fecha ya pasó. Elegí una fecha desde hoy.' : '';
+    if (!err){ const c = S.events.find(x => x.id !== eid && x.place.toLowerCase() === v.place.toLowerCase() && overlap(x, v)); if (c) err = `Se superpone con «${c.title}» (${c.time}) en ${c.place}.` }
+    if (err){ UI.modal.err = err; renderModal(); return }
+    if (eid){ Object.assign(ev(eid), v); log(`editó ${evLabel(ev(eid))}`); save(); openModal('ev', { e: eid }); render(); toast('Cambios guardados'); return }
+    const id = uid('e'); const tids = data.getAll('teams');
+    S.events.push({ id, ...v, positions: tids.flatMap(t => team(t).roles.map(r => ({ id: uid('q'), team: t, role: r, person: null, status: null, note: '' }))) });
+    log(`creó ${evLabel(ev(id))}`); save(); UI.calAnchor = v.date; openModal('ev', { e: id }); render(); toast('Evento creado', fmtShort(v.date) + ' · ' + v.time);
+  },
+  person: (f, data) => {
+    const id = f.dataset.id, g = n => (data.get(n) || '').toString().trim();
+    const v = { first: g('first'), last: g('last'), phone: g('phone'), email: g('email'), teams: data.getAll('teams') };
+    let err = !v.first || !v.last ? 'Nombre y apellido son obligatorios.' : v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) ? 'El email no tiene un formato válido.' : v.phone && !/^\+?[\d\s-]{7,}$/.test(v.phone) ? 'El teléfono solo puede tener números, espacios, guiones y +.' : '';
+    if (!err && S.people.some(p => p.id !== id && fullName(p).toLowerCase() === (v.first + ' ' + v.last).toLowerCase())) err = 'Ya existe una persona con ese nombre.';
+    if (err){ UI.modal.err = err; renderModal(); return }
+    if (id){ const p = per(id); const wasActive = p.active; Object.assign(p, v); p.active = !!data.get('active'); log(`editó los datos de ${fullName(p)}${wasActive && !p.active ? ' (baja lógica)' : ''}`); toast(wasActive && !p.active ? `${fullName(p)} quedó inactiva` : 'Persona actualizada', wasActive && !p.active ? 'Conserva su historial' : '') }
+    else { S.people.push({ id: uid('p'), ...v, active: true, blocked: [] }); log(`agregó a ${v.first} ${v.last}`); toast('Persona agregada', v.first + ' ' + v.last) }
+    save(); closeModal(); render();
+  },
+  item: (f, data) => {
+    const eid = f.dataset.e, iid = f.dataset.i, g = n => (data.get(n) || '').toString().trim();
+    const v = { title: g('title'), dur: Number(g('dur')), resp: g('resp'), notes: g('notes') };
+    if (!v.title || !(v.dur >= 1 && v.dur <= 180)){ UI.modal.err = !v.title ? 'Ingresá el nombre del elemento.' : 'La duración tiene que estar entre 1 y 180 minutos.'; renderModal(); return }
+    if (!S.plans[eid]) S.plans[eid] = { items: [] };
+    if (iid) Object.assign(S.plans[eid].items.find(x => x.id === iid), v); else S.plans[eid].items.push({ id: uid('i'), ...v });
+    log(`${iid ? 'editó' : 'agregó'} «${v.title}» en el plan · ${evLabel(ev(eid))}`); save(); closeModal(); render(); toast(iid ? 'Elemento actualizado' : 'Elemento agregado');
+  },
+  tpl: (f, data) => {
+    const name = (data.get('name') || '').toString().trim();
+    if (!name){ UI.modal.err = 'Ingresá un nombre.'; renderModal(); return }
+    if (S.templates.some(t => t.name.toLowerCase() === name.toLowerCase())){ UI.modal.err = 'Ya hay una plantilla con ese nombre.'; renderModal(); return }
+    S.templates.push({ id: uid('t'), name, items: S.plans[f.dataset.e].items.map(i => ({ ...i, id: uid('i'), notes: '' })) });
+    log(`guardó la plantilla «${name}»`); save(); closeModal(); render(); toast('Plantilla guardada', name);
+  },
+  reject: (f, data) => {
+    const e = ev(f.dataset.e), pos = e.positions.find(x => x.id === f.dataset.p);
+    pos.status = 'rechazado'; pos.note = (data.get('note') || '').toString().trim();
+    log(`rechazó ${pos.role} · ${evLabel(e)}`); save(); closeModal(); render(); toast('Avisamos a tu líder', 'Aviso simulado, sin envío real');
+  },
+  addPos: (f, data) => {
+    const e = ev(f.dataset.e), t = data.get('team'), r = data.get('role');
+    e.positions.push({ id: uid('q'), team: t, role: r, person: null, status: null, note: '' });
+    log(`agregó la posición ${r} (${team(t).name}) · ${evLabel(e)}`); save(); closeModal(); render(); toast('Posición agregada', r);
+  },
+  member: (f, data) => {
+    const id = data.get('id'); if (!id) return; const p = per(id), t = team(f.dataset.t);
+    p.teams.push(t.id); log(`sumó a ${fullName(p)} a ${t.name}`); save(); render(); toast(`${fullName(p)} se sumó a ${t.name}`);
+  },
+  role: (f, data) => {
+    const r = (data.get('role') || '').toString().trim(), t = team(f.dataset.t);
+    if (!r || t.roles.some(x => x.toLowerCase() === r.toLowerCase())){ toast(r ? 'Ese rol ya existe' : 'Escribí el nombre del rol', '', true); return }
+    t.roles.push(r); log(`agregó el rol ${r} a ${t.name}`); save(); render(); toast('Rol agregado', r);
+  },
+};
+
+document.addEventListener('click', ev_ => {
+  const b = ev_.target.closest('[data-a]');
+  if (b && !b.disabled && A[b.dataset.a]){ ev_.preventDefault(); A[b.dataset.a](b.dataset, b); return }
+  if (ev_.target.id === 'modal') closeModal();
+});
+document.addEventListener('submit', e => { e.preventDefault(); const f = e.target; if (F[f.dataset.form]) F[f.dataset.form](f, new FormData(f)) });
+document.addEventListener('input', e => { if (e.target.id === 'pq'){ UI.pq = e.target.value; renderPeopleRows() } });
+document.addEventListener('change', e => {
+  if (e.target.id === 'pteam'){ UI.pteam = e.target.value; renderPeopleRows() }
+  if (e.target.dataset.change === 'posTeam'){ UI.modal.t = e.target.value; renderModal() }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.modal) closeModal() });
+
+render();
+</script>
+
+</body></html>
